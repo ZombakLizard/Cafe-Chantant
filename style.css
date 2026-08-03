@@ -14,6 +14,8 @@ body{
     color:#ffffff;
     overflow-x:hidden;
     min-height:100vh;
+    display:flex;
+    flex-direction:column;
 }
 
 #background{
@@ -117,6 +119,7 @@ button:hover{
 #terminal{
     display:none;
     padding:50px 20px 120px;
+    flex:1;
 }
 
 .terminalWindow{
@@ -145,6 +148,12 @@ pre{
     line-height:1.8;
 }
 
+#printAll{
+    display:block;
+    width:280px;
+    margin:35px auto 0;
+}
+
 #rain{
     position:fixed;
     inset:0;
@@ -156,10 +165,7 @@ pre{
 }
 
 body.protocol #background{
-    filter:
-        grayscale(.75)
-        brightness(.45)
-        saturate(.55);
+    filter:grayscale(.75) brightness(.45) saturate(.55);
     transform:scale(1.05);
 }
 
@@ -175,10 +181,7 @@ body.protocol #overlay{
 }
 
 body.protocol #headerImage{
-    filter:
-        grayscale(.8)
-        brightness(.8)
-        hue-rotate(180deg);
+    filter:grayscale(.8) brightness(.8) hue-rotate(180deg);
 }
 
 body.protocol .glass{
@@ -239,6 +242,27 @@ body.protocol #rain{
 
 }
 
+footer{
+    margin-top:auto;
+    width:100%;
+    padding:25px 15px;
+    text-align:center;
+    color:rgba(255,255,255,.55);
+    font-size:15px;
+    letter-spacing:.5px;
+}
+
+footer a{
+    color:#d7b27a;
+    text-decoration:none;
+    transition:.25s;
+}
+
+footer a:hover{
+    color:#ffffff;
+    text-shadow:0 0 10px rgba(255,220,160,.5);
+}
+
 @media(max-width:900px){
 
 .glass{
@@ -271,6 +295,12 @@ pre{
 
 }
 
+#printAll{
+
+    width:100%;
+
+}
+
 }
 
 @media(max-width:600px){
@@ -284,7 +314,6 @@ main{
 .glass{
 
     padding:28px;
-
     border-radius:22px;
 
 }
@@ -292,7 +321,6 @@ main{
 .glass h2{
 
     font-size:34px;
-
     margin-bottom:20px;
 
 }
@@ -300,7 +328,6 @@ main{
 input{
 
     height:54px;
-
     font-size:18px;
 
 }
@@ -308,7 +335,6 @@ input{
 button{
 
     height:54px;
-
     font-size:18px;
 
 }
@@ -328,30 +354,21 @@ button{
 pre{
 
     font-size:15px;
-
     line-height:1.6;
 
 }
 
-}
-
 #printAll{
-    margin-top:30px;
+
+    font-size:17px;
+
 }
 
 footer{
-    text-align:center;
-    padding:35px 20px;
-    color:rgba(255,255,255,.6);
-    font-size:15px;
+
+    font-size:13px;
+    padding:20px 10px;
+
 }
 
-footer a{
-    color:#d7b27a;
-    text-decoration:none;
-    transition:.25s;
-}
-
-footer a:hover{
-    color:#ffffff;
 }
