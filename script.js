@@ -6,11 +6,12 @@ const output = document.getElementById("output");
 const rain = document.getElementById("rain");
 const printAll = document.getElementById("printAll");
 
+let typingTimer = null;
 let typingFinished = false;
 
 const protocol = `Протокол K051C принят.
 
-Протокол K051C принят. Пожалуйста, определите тип угрозы и соблюдайте инструкции 
+Протокол K051C принят. Пожалуйста, определите тип угрозы и соблюдайте инструкции
 
 · I — можно игнорировать.
 · II — надо закрыть.
@@ -18,13 +19,13 @@ const protocol = `Протокол K051C принят.
 · IV — надо уйти.
 · V — надо спасаться.
 
-🌧️ K051C(I) — Легкий дождь 
+🌧️ K051C(I) — Легкий дождь
 
 · Признак: Капли не ощутимы
 · Действие:
-1. Проверить, что Самиздат застёгнута и все содержимое. 
+1. Проверить, что Самиздат застёгнута и все содержимое.
 
- ☔️ K051C(II) — Умеренный дождь 
+☔️ K051C(II) — Умеренный дождь
 
 · Признак: Капли отчётливо слышны, но нет потоков воды.
 · Действие:
@@ -32,7 +33,7 @@ const protocol = `Протокол K051C принят.
 2. Проверить все содержимое Самиздат.
 3. Одеть дождевик
 
-☔️ K051C(III) — Сильный дождь 
+☔️ K051C(III) — Сильный дождь
 
 · Признак: Вода течёт по одежде, трудно идти, ветер раскачивает.
 · Действие:
@@ -44,7 +45,7 @@ const protocol = `Протокол K051C принят.
 
 (Все проверки проводить на ощупь)
 
-⛈️ K051C(IV) — Ливень 
+⛈️ K051C(IV) — Ливень
 
 · Признак: Вода льёт стеной, видимость плохая, молнии рядом, можно захлебнутся
 · Действие:
@@ -129,52 +130,54 @@ function activate() {
 
         typeWriter(protocol);
 
-    }, 700);
+    },700);
 
 }
 
-function typeWriter(text) {
+function typeWriter(text){
 
-    output.textContent = "";
-    typingFinished = false;
+    output.textContent="";
 
-    printAll.style.display = "block";
+    typingFinished=false;
 
-    let i = 0;
+    printAll.style.display="block";
 
-    const timer = setInterval(() => {
+    let i=0;
 
-        output.textContent += text.charAt(i);
+    typingTimer=setInterval(()=>{
+
+        output.textContent+=text.charAt(i);
 
         i++;
 
-        if (i >= text.length) {
+        if(i>=text.length){
 
-            clearInterval(timer);
+            clearInterval(typingTimer);
 
-            typingFinished = true;
+            typingFinished=true;
 
-            printAll.style.display = "none";
+            printAll.style.display="none";
 
         }
 
-    }, 15);
-
-    printAll.onclick = () => {
-
-        if (typingFinished) return;
-
-        clearInterval(timer);
-
-        output.textContent = text;
-
-        typingFinished = true;
-
-        printAll.style.display = "none";
-
-    };
+    },15);
 
 }
+
+printAll.addEventListener("click",()=>{
+
+
+                              if (typingFinished) return;
+
+    clearInterval(typingTimer);
+
+    output.textContent = protocol;
+
+    typingFinished = true;
+
+    printAll.style.display = "none";
+
+});
 
 function createRain() {
 
