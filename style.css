@@ -334,3 +334,24 @@ pre{
 }
 
 }
+
+#printAll{
+    margin-top:30px;
+}
+
+footer{
+    text-align:center;
+    padding:35px 20px;
+    color:rgba(255,255,255,.6);
+    font-size:15px;
+}
+
+footer a{
+    color:#d7b27a;
+    text-decoration:none;
+    transition:.25s;
+}
+
+footer a:hover{
+    color:#ffffff;
+}
