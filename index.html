@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кафе Шантан</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: "Manrope", sans-serif;
+            background: #1c140f;
+            color: #ffffff;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #background {
+            position: fixed;
+            inset: 0;
+            background: url("cafe.jpg") center center/cover no-repeat;
+            transition: 2.5s;
+            z-index: -10;
+        }
+
+        #background::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: rgba(75, 45, 20, .22);
+            transition: 2.5s;
+        }
+
+        #overlay {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(rgba(60, 35, 15, .18), rgba(12, 8, 6, .78));
+            backdrop-filter: blur(2px);
+            transition: 2.5s;
+            z-index: -9;
+        }
+
+        header {
+            width: 100%;
+        }
+
+        #headerImage {
+            display: block;
+            width: 100%;
+            height: auto;
+            user-select: none;
+            pointer-events: none;
+            transition: 2.5s;
+        }
+
+        main {
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px 70px;
+        }
+
+        .glass {
+            width: min(540px, 95%);
+            padding: 45px;
+            border-radius: 28px;
+            background: rgba(70, 40, 18, .34);
+            border: 1px solid rgba(255, 255, 255, .08);
+            backdrop-filter: blur(18px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, .45);
+            transition: 2s;
+        }
+
+        .glass h2 {
+            font-family: "Cormorant Garamond", serif;
+            font-size: 52px;
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        input {
+            width: 100%;
+            height: 60px;
+            border: none;
+            outline: none;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, .08);
+            color: white;
+            text-align: center;
+            font-size: 22px;
+            transition: .3s;
+        }
+
+        input:focus {
+            background: rgba(255, 255, 255, .14);
+            box-shadow: 0 0 25px rgba(255, 210, 130, .35);
+        }
+
+        button {
+            width: 100%;
+            height: 58px;
+            margin-top: 18px;
+            border: none;
+            border-radius: 18px;
+            cursor: pointer;
+            color: white;
+            font-size: 20px;
+            background: linear-gradient(#9d6b42, #714220);
+            transition: .25s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(255, 180, 80, .45);
+        }
+
+        #terminal {
+            display: none;
+            padding: 50px 20px 120px;
+        }
+
+        .terminalWindow {
+            width: min(950px, 96%);
+            margin: auto;
+            padding: 40px;
+            border-radius: 24px;
+            background: rgba(15, 22, 38, .55);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, .08);
+            box-shadow: 0 20px 70px rgba(0, 0, 0, .55);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .terminalWindow h1 {
+            font-family: "Cormorant Garamond", serif;
+            text-align: center;
+            font-size: 54px;
+            margin-bottom: 25px;
+            width: 100%;
+        }
+
+        pre {
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-family: "Courier New", monospace;
+            font-size: 20px;
+            line-height: 1.8;
+            width: 100%;
+        }
+
+        #printAll {
+            display: none;
+            width: auto;
+            min-width: 220px;
+            padding: 14px 32px;
+            margin: 30px auto 0;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 18px;
+            font-family: "Manrope", sans-serif;
+            cursor: pointer;
+            transition: 0.25s;
+            backdrop-filter: blur(10px);
+        }
+
+        #printAll:hover {
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 25px rgba(200, 220, 255, 0.35);
+            transform: translateY(-2px);
+        }
+
+        footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 24px 20px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.45);
+            z-index: 1;
+            position: relative;
+        }
+
+        footer a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+            transition: 0.2s;
+        }
+
+        footer a:hover {
+            color: #fff;
+            border-bottom-color: #fff;
+        }
+
+        #rain {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            opacity: 0;
+            transition: 2s;
+            z-index: 100;
+        }
+
+        body.protocol #background {
+            filter: grayscale(.75) brightness(.45) saturate(.55);
+            transform: scale(1.05);
+        }
+
+        body.protocol #background::after {
+            background: rgba(40, 85, 170, .35);
+        }
+
+        body.protocol #overlay {
+            background: linear-gradient(rgba(20, 45, 90, .35), rgba(5, 10, 20, .9));
+        }
+
+        body.protocol #headerImage {
+            filter: grayscale(.8) brightness(.8) hue-rotate(180deg);
+        }
+
+        body.protocol .glass {
+            background: rgba(20, 35, 55, .45);
+            border: 1px solid rgba(180, 220, 255, .15);
+        }
+
+        body.protocol button {
+            background: linear-gradient(#6588b7, #365374);
+        }
+
+        body.protocol #rain {
+            opacity: 1;
+        }
+
+        .drop {
+            position: absolute;
+            top: -150px;
+            width: 2px;
+            border-radius: 20px;
+            background: linear-gradient(transparent, rgba(255, 255, 255, .75), rgba(255, 255, 255, .08));
+            animation: rain linear infinite;
+        }
+
+        @keyframes rain {
+            0% {
+                transform: translateY(-150px);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(calc(100vh + 250px));
+                opacity: .2;
+            }
+        }
+
+        @keyframes fade {
+            0% {
+                opacity: 0;
+                transform: translateY(25px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media(max-width:900px) {
+            .glass {
+                padding: 35px;
+            }
+            .glass h2 {
+                font-size: 42px;
+            }
+            .terminalWindow {
+                padding: 28px;
+            }
+            .terminalWindow h1 {
+                font-size: 42px;
+            }
+            pre {
+                font-size: 17px;
+            }
+            #printAll {
+                min-width: 180px;
+                padding: 12px 28px;
+                font-size: 16px;
+            }
+        }
+
+        @media(max-width:600px) {
+            main {
+                padding: 25px 15px 60px;
+            }
+            .glass {
+                padding: 28px;
+                border-radius: 22px;
+            }
+            .glass h2 {
+                font-size: 34px;
+                margin-bottom: 20px;
+            }
+            input {
+                height: 54px;
+                font-size: 18px;
+            }
+            button {
+                height: 54px;
+                font-size: 18px;
+            }
+            .terminalWindow {
+                padding: 22px;
+            }
+            .terminalWindow h1 {
+                font-size: 34px;
+            }
+            pre {
+                font-size: 15px;
+                line-height: 1.6;
+            }
+            #printAll {
+                min-width: 160px;
+                padding: 12px 24px;
+                font-size: 15px;
+            }
+            footer {
+                font-size: 13px;
+                padding: 20px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="background"></div>
+    <div id="overlay"></div>
+    <div id="rain"></div>
+    <header>
+        <img src="header.jpg" id="headerImage" alt="Шапка кафе">
+    </header>
+    <main>
+        <div class="glass">
+            <h2>Введите протокол</h2>
+            <input id="protocol" type="text" autocomplete="off" spellcheck="false">
+            <button id="confirm">Подтвердить</button>
+        </div>
+    </main>
+    <section id="terminal">
+        <div class="terminalWindow">
+            <h1>Кафе Шантан</h1>
+            <pre id="output"></pre>
+            <button id="printAll">Напечатать всё</button>
+        </div>
+    </section>
+    <footer>
+        <p>© Кафе Шантан 2026 | by <a href="https://steamcommunity.com/id/zombaklizard/" target="_blank" rel="noopener">ZombakLizard</a></p>
+    </footer>
+
+    <script>
+        const input = document.getElementById("protocol");
+        const button = document.getElementById("confirm");
+        const glass = document.querySelector(".glass");
+        const terminal = document.getElementById("terminal");
+        const output = document.getElementById("output");
+        const rain = document.getElementById("rain");
+        const printAllBtn = document.getElementById("printAll");
+
+        let typewriterTimer = null;
+
+        const protocol = `Протокол K051C принят.
+
+Протокол K051C принят. Пожалуйста, определите тип угрозы и соблюдайте инструкции 
+
+· I — можно игнорировать.
+· II — надо закрыть.
+· III — надо спрятать.
+· IV — надо уйти.
+· V — надо спасаться.
+
+🌧️ K051C(I) — Легкий дождь 
+
+· Признак: Капли не ощутимы
+· Действие:
+1. Проверить, что Самиздат застёгнута и все содержимое. 
+
+ ☔️ K051C(II) — Умеренный дождь 
+
+· Признак: Капли отчётливо слышны, но нет потоков воды.
+· Действие:
+1. Спрятать Самиздат в основное отделение. 
+2. Проверить все содержимое Самиздат. 
+3. Одеть дождевик 
+
+☔️ K051C(III) — Сильный дождь 
+
+· Признак: Вода течёт по одежде, трудно идти, ветер раскачивает. 
+· Действие: 
+1. Переместить Самиздат в герметичный мешок.
+2. Проверить все содержимое Самиздат. 
+3. Спрятать кабель питания Самиздат на левой лямке. 
+4. Одеть дождевик 
+5. Постараться найти укрытие 
+
+(Все проверки проводить на ощупь)
+
+⛈️ K051C(IV) — Ливень 
+
+· Признак: Вода льёт стеной, видимость плохая, молнии рядом, можно захлебнутся 
+· Действие: 
+1. Искать укрытие
+2. Переместить Самиздат в герметичный мешок. 
+3. Проверить все содержимое Самиздат. 
+4. Спрятать кабель питания Самиздат на левой лямке. 
+5. Проверить порты в отсеке N3.
+6. Одеть дождевик 
+
+(Все проверки проводить на ощупь)
+
+⛈️ K051C(V) — Экстремальный ливень
+
+· Признак: Вода заливает всё вокруг, опасно находиться на улице. Молнии бьют рядом. Уровень воды стремительно поднимается
+· Действие: 
+1. Искать укрытие
+2. Переместить Самиздат в герметичный мешок. 
+3. Проверить все содержимое Самиздат. 
+4. Спрятать кабель питания Самиздат на левой лямке. 
+5. Проверить порты в отсеке N3.
+6. Спрятать все модули внутрь дрейдла. 
+7. Одеть дождевик 
+
+(Все проверки проводить на ощупь)
+`;
+
+        button.addEventListener("click", checkProtocol);
+
+        input.addEventListener("keydown", e => {
+            if (e.key === "Enter") {
+                checkProtocol();
+            }
+        });
+
+        printAllBtn.addEventListener("click", () => {
+            if (typewriterTimer) {
+                clearInterval(typewriterTimer);
+                typewriterTimer = null;
+            }
+            output.textContent = protocol;
+            printAllBtn.style.display = "none";
+        });
+
+        function checkProtocol() {
+            if (input.value.trim().toUpperCase() === "K051C") {
+                activate();
+            } else {
+                input.animate([
+                    { transform: "translateX(-8px)" },
+                    { transform: "translateX(8px)" },
+                    { transform: "translateX(-8px)" },
+                    { transform: "translateX(0)" }
+                ], {
+                    duration: 350
+                });
+            }
+        }
+
+        function activate() {
+            document.body.classList.add("protocol");
+            createRain();
+
+            glass.animate([
+                { opacity: 1, transform: "translateY(0px)" },
+                { opacity: 0, transform: "translateY(-20px)" }
+            ], {
+                duration: 700,
+                fill: "forwards"
+            });
+
+            setTimeout(() => {
+                glass.style.display = "none";
+                terminal.style.display = "block";
+                terminal.style.animation = "fade .8s";
+                printAllBtn.style.display = "inline-block";
+                typeWriter(protocol);
+            }, 700);
+        }
+
+        function typeWriter(text) {
+            output.textContent = "";
+            let i = 0;
+            typewriterTimer = setInterval(() => {
+                output.textContent += text.charAt(i);
+                i++;
+                if (i >= text.length) {
+                    clearInterval(typewriterTimer);
+                    typewriterTimer = null;
+                    printAllBtn.style.display = "none";
+                }
+            }, 15);
+        }
+
+        function createRain() {
+            rain.innerHTML = "";
+            for (let i = 0; i < 180; i++) {
+                const drop = document.createElement("div");
+                drop.className = "drop";
+                drop.style.left = Math.random() * 100 + "vw";
+                drop.style.height = 50 + Math.random() * 120 + "px";
+                drop.style.animationDuration = 0.8 + Math.random() * 1.3 + "s";
+                drop.style.animationDelay = Math.random() * 2 + "s";
+                rain.appendChild(drop);
+            }
+        }
+    </script>
+</body>
+</html>
