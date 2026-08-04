@@ -211,7 +211,6 @@
             border-bottom-color: #fff;
         }
 
-        /* --- Анимация дождя --- */
         #rain {
             position: fixed;
             inset: 0;
@@ -222,7 +221,6 @@
             z-index: 100;
         }
 
-        /* --- Анимация ветра --- */
         #wind {
             position: fixed;
             inset: 0;
@@ -233,9 +231,6 @@
             z-index: 100;
         }
 
-        /* --- Состояния протоколов --- */
-
-        /* Протокол дождя (K051C) */
         body.protocol-rain #background {
             filter: grayscale(.75) brightness(.45) saturate(.55);
             transform: scale(1.05);
@@ -266,7 +261,6 @@
             opacity: 1;
         }
 
-        /* Протокол ветра (I300B) */
         body.protocol-wind #background {
             filter: grayscale(1) brightness(.5) saturate(.3);
             transform: scale(1.05);
@@ -297,7 +291,6 @@
             opacity: 1;
         }
 
-        /* Капли дождя */
         .drop {
             position: absolute;
             top: -150px;
@@ -321,7 +314,6 @@
             }
         }
 
-        /* Частицы ветра (линии, пыль) */
         .wind-particle {
             position: absolute;
             left: -150px;
@@ -329,6 +321,7 @@
             background: linear-gradient(to right, transparent, rgba(200, 200, 200, 0.6), rgba(180, 180, 180, 0.1));
             border-radius: 2px;
             animation: wind-blow linear infinite;
+            opacity: 0;
         }
 
         @keyframes wind-blow {
@@ -348,12 +341,13 @@
             }
         }
 
-        /* Пылевые точки */
         .dust-particle {
             position: absolute;
+            left: -150px;
             background: rgba(180, 180, 180, 0.5);
             border-radius: 50%;
             animation: wind-dust linear infinite;
+            opacity: 0;
         }
 
         @keyframes wind-dust {
@@ -490,7 +484,7 @@
         const printAllBtn = document.getElementById("printAll");
 
         let typewriterTimer = null;
-        let activeProtocol = null; // 'rain' или 'wind'
+        let activeProtocol = null;
 
         const protocolRain = `Протокол K051C принят.
 
@@ -556,9 +550,7 @@
 (Все проверки проводить на ощупь)
 `;
 
-        const protocolWind = `Протокол I300B принят.
-
-Протокол I300B принят. Пожалуйста, определите тип угрозы и соблюдайте инструкции.
+        const protocolWind = `Протокол I300B принят. Пожалуйста, определите тип угрозы и соблюдайте инструкции.
 
 · I — можно игнорировать.
 · II — надо закрепить.
@@ -651,26 +643,21 @@
         }
 
         function activateProtocol(type, text) {
-            // Сброс предыдущих классов
             document.body.classList.remove("protocol-rain", "protocol-wind");
-            // Скрываем эффекты
             rain.style.opacity = '0';
             wind.style.opacity = '0';
-            // Очищаем контейнеры эффектов
             rain.innerHTML = '';
             wind.innerHTML = '';
 
             activeProtocol = type;
             document.body.classList.add(type === 'rain' ? 'protocol-rain' : 'protocol-wind');
 
-            // Запуск анимации эффектов
             if (type === 'rain') {
                 createRain();
             } else if (type === 'wind') {
                 createWind();
             }
 
-            // Анимация исчезновения формы ввода
             glass.animate([
                 { opacity: 1, transform: "translateY(0px)" },
                 { opacity: 0, transform: "translateY(-20px)" }
@@ -719,7 +706,6 @@
         function createWind() {
             wind.innerHTML = "";
 
-            // Линии ветра
             for (let i = 0; i < 60; i++) {
                 const particle = document.createElement("div");
                 particle.className = "wind-particle";
@@ -730,7 +716,6 @@
                 wind.appendChild(particle);
             }
 
-            // Пылевые частицы
             for (let i = 0; i < 40; i++) {
                 const dust = document.createElement("div");
                 dust.className = "dust-particle";
