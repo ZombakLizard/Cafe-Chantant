@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -162,7 +163,6 @@
             width: 100%;
         }
 
-        /* Фиксированная кнопка */
         #printAll {
             display: none;
             position: fixed;
@@ -181,7 +181,7 @@
             cursor: pointer;
             transition: 0.25s;
             backdrop-filter: blur(10px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
         }
 
         #printAll:hover {
@@ -212,6 +212,7 @@
             border-bottom-color: #fff;
         }
 
+        /* --- Анимация дождя --- */
         #rain {
             position: fixed;
             inset: 0;
@@ -222,36 +223,82 @@
             z-index: 100;
         }
 
-        body.protocol #background {
+        /* --- Анимация ветра --- */
+        #wind {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            opacity: 0;
+            transition: 2s;
+            z-index: 100;
+        }
+
+        /* --- Состояния протоколов --- */
+
+        /* Протокол дождя (K051C) */
+        body.protocol-rain #background {
             filter: grayscale(.75) brightness(.45) saturate(.55);
             transform: scale(1.05);
         }
 
-        body.protocol #background::after {
+        body.protocol-rain #background::after {
             background: rgba(40, 85, 170, .35);
         }
 
-        body.protocol #overlay {
+        body.protocol-rain #overlay {
             background: linear-gradient(rgba(20, 45, 90, .35), rgba(5, 10, 20, .9));
         }
 
-        body.protocol #headerImage {
+        body.protocol-rain #headerImage {
             filter: grayscale(.8) brightness(.8) hue-rotate(180deg);
         }
 
-        body.protocol .glass {
+        body.protocol-rain .glass {
             background: rgba(20, 35, 55, .45);
             border: 1px solid rgba(180, 220, 255, .15);
         }
 
-        body.protocol button {
+        body.protocol-rain button {
             background: linear-gradient(#6588b7, #365374);
         }
 
-        body.protocol #rain {
+        body.protocol-rain #rain {
             opacity: 1;
         }
 
+        /* Протокол ветра (I300B) */
+        body.protocol-wind #background {
+            filter: grayscale(1) brightness(.5) saturate(.3);
+            transform: scale(1.05);
+        }
+
+        body.protocol-wind #background::after {
+            background: rgba(60, 60, 60, 0.4);
+        }
+
+        body.protocol-wind #overlay {
+            background: linear-gradient(rgba(30, 30, 30, 0.5), rgba(5, 5, 5, 0.9));
+        }
+
+        body.protocol-wind #headerImage {
+            filter: grayscale(1) brightness(.7);
+        }
+
+        body.protocol-wind .glass {
+            background: rgba(40, 40, 40, .5);
+            border: 1px solid rgba(200, 200, 200, .15);
+        }
+
+        body.protocol-wind button {
+            background: linear-gradient(#777, #444);
+        }
+
+        body.protocol-wind #wind {
+            opacity: 1;
+        }
+
+        /* Капли дождя */
         .drop {
             position: absolute;
             top: -150px;
@@ -272,6 +319,58 @@
             100% {
                 transform: translateY(calc(100vh + 250px));
                 opacity: .2;
+            }
+        }
+
+        /* Частицы ветра (линии, пыль) */
+        .wind-particle {
+            position: absolute;
+            left: -150px;
+            height: 1.5px;
+            background: linear-gradient(to right, transparent, rgba(200, 200, 200, 0.6), rgba(180, 180, 180, 0.1));
+            border-radius: 2px;
+            animation: wind-blow linear infinite;
+        }
+
+        @keyframes wind-blow {
+            0% {
+                transform: translateX(-150px);
+                opacity: 0;
+            }
+            15% {
+                opacity: 0.7;
+            }
+            85% {
+                opacity: 0.4;
+            }
+            100% {
+                transform: translateX(calc(100vw + 300px));
+                opacity: 0;
+            }
+        }
+
+        /* Пылевые точки */
+        .dust-particle {
+            position: absolute;
+            background: rgba(180, 180, 180, 0.5);
+            border-radius: 50%;
+            animation: wind-dust linear infinite;
+        }
+
+        @keyframes wind-dust {
+            0% {
+                transform: translateX(-50px) translateY(0px);
+                opacity: 0;
+            }
+            20% {
+                opacity: 0.6;
+            }
+            80% {
+                opacity: 0.2;
+            }
+            100% {
+                transform: translateX(calc(100vw + 100px)) translateY(-30px);
+                opacity: 0;
             }
         }
 
@@ -359,6 +458,7 @@
     <div id="background"></div>
     <div id="overlay"></div>
     <div id="rain"></div>
+    <div id="wind"></div>
     <header>
         <img src="header.jpg" id="headerImage" alt="Шапка кафе">
     </header>
@@ -375,7 +475,6 @@
             <pre id="output"></pre>
         </div>
     </section>
-    <!-- Фиксированная кнопка "Напечатать всё" вне терминала -->
     <button id="printAll">Напечатать всё</button>
     <footer>
         <p>© Кафе Шантан 2026 | by <a href="https://steamcommunity.com/id/zombaklizard/" target="_blank" rel="noopener">ZombakLizard</a></p>
@@ -388,11 +487,13 @@
         const terminal = document.getElementById("terminal");
         const output = document.getElementById("output");
         const rain = document.getElementById("rain");
+        const wind = document.getElementById("wind");
         const printAllBtn = document.getElementById("printAll");
 
         let typewriterTimer = null;
+        let activeProtocol = null; // 'rain' или 'wind'
 
-        const protocol = `Протокол K051C принят.
+        const protocolRain = `Протокол K051C принят.
 
 Протокол K051C принят. Пожалуйста, определите тип угрозы и соблюдайте инструкции 
 
@@ -456,12 +557,69 @@
 (Все проверки проводить на ощупь)
 `;
 
-        button.addEventListener("click", checkProtocol);
+        const protocolWind = `Протокол I300B принят.
 
+Протокол I300B принят. Пожалуйста, определите тип угрозы и соблюдайте инструкции.
+
+· I — можно игнорировать.
+· II — надо закрепить.
+· III — надо спрятать.
+· IV — надо уйти.
+· V — надо спасаться.
+
+🌬️ I300B(I) — Сильный ветер
+
+· Признак: Ветер постоянно ощущается, одежда развивается, мелкие ветки качаются.
+· Действие:
+1. Проверить, что все внешние модули надежно закреплены.
+2. Проверить Самиздат.
+3. Проверить фастексы Дрейдла.
+
+🌪️ I300B(II) — Очень сильный ветер
+
+· Признак: Идти становится некомфортно, ветер сбивает капюшон, с деревьев летят мелкие ветки.
+· Действие:
+1. Убрать Самиздат в основное отделение.
+2. Спрятать все модули в основное отделение.
+3. Спрятать все предметы с навесным креплением.
+
+🌪️ I300B(III) — Штормовой ветер
+
+· Признак: Ветер заметно мешает идти, возможны падения небольших веток и лёгких предметов.
+· Действие:
+1. Убрать Самиздат в основное отделение.
+2. Спрятать все модули в основное отделение.
+3. Спрятать все предметы с навесным креплением.
+4. Не проходить под деревьями и рекламными конструкциями.
+
+🌪️ I300B(IV) — Ураган
+
+· Признак: Идти крайне трудно, ветер способен валить ветки и небольшие деревья, возможны летающие предметы.
+· Действие:
+1. Немедленно искать капитальное укрытие.
+2. Убрать Самиздат в основное отделение.
+3. Спрятать все модули в основное отделение.
+4. Спрятать все предметы с навесным креплением.
+5. Не проходить под деревьями и рекламными конструкциями.
+6. При условии что Дрейдл нагружен и для модулей нету места - отбросить предметы не из системы Дрейдл.
+
+🌪️ I300B(V) — Экстремальный ураган
+
+· Признак: Передвигаться практически невозможно. Летают крупные предметы, разрушаются конструкции, существует непосредственная угроза жизни.
+· Действие:
+1. Немедленно укрыться в капитальном сооружении.
+2. Полностью прекратить движение, если укрытие найдено.
+3. Не покидать укрытие до окончания ветра.
+4. Убрать Самиздат в основное отделение.
+5. Спрятать все модули в основное отделение.
+6. Спрятать все предметы с навесным креплением.
+7. Не проходить под деревьями и рекламными конструкциями.
+8. При условии что Дрейдл нагружен и для модулей нету места - отбросить предметы не из системы Дрейдл.
+`;
+
+        button.addEventListener("click", checkProtocol);
         input.addEventListener("keydown", e => {
-            if (e.key === "Enter") {
-                checkProtocol();
-            }
+            if (e.key === "Enter") checkProtocol();
         });
 
         printAllBtn.addEventListener("click", () => {
@@ -469,29 +627,51 @@
                 clearInterval(typewriterTimer);
                 typewriterTimer = null;
             }
-            output.textContent = protocol;
+            if (activeProtocol === 'rain') {
+                output.textContent = protocolRain;
+            } else if (activeProtocol === 'wind') {
+                output.textContent = protocolWind;
+            }
             printAllBtn.style.display = "none";
         });
 
         function checkProtocol() {
-            if (input.value.trim().toUpperCase() === "K051C") {
-                activate();
+            const val = input.value.trim().toUpperCase();
+            if (val === "K051C") {
+                activateProtocol('rain', protocolRain);
+            } else if (val === "I300B") {
+                activateProtocol('wind', protocolWind);
             } else {
                 input.animate([
                     { transform: "translateX(-8px)" },
                     { transform: "translateX(8px)" },
                     { transform: "translateX(-8px)" },
                     { transform: "translateX(0)" }
-                ], {
-                    duration: 350
-                });
+                ], { duration: 350 });
             }
         }
 
-        function activate() {
-            document.body.classList.add("protocol");
-            createRain();
+        function activateProtocol(type, text) {
+            // Сброс предыдущих классов
+            document.body.classList.remove("protocol-rain", "protocol-wind");
+            // Скрываем эффекты
+            rain.style.opacity = '0';
+            wind.style.opacity = '0';
+            // Очищаем контейнеры эффектов
+            rain.innerHTML = '';
+            wind.innerHTML = '';
 
+            activeProtocol = type;
+            document.body.classList.add(type === 'rain' ? 'protocol-rain' : 'protocol-wind');
+
+            // Запуск анимации эффектов
+            if (type === 'rain') {
+                createRain();
+            } else if (type === 'wind') {
+                createWind();
+            }
+
+            // Анимация исчезновения формы ввода
             glass.animate([
                 { opacity: 1, transform: "translateY(0px)" },
                 { opacity: 0, transform: "translateY(-20px)" }
@@ -504,9 +684,8 @@
                 glass.style.display = "none";
                 terminal.style.display = "block";
                 terminal.style.animation = "fade .8s";
-                // Показать кнопку (фиксированную)
                 printAllBtn.style.display = "inline-block";
-                typeWriter(protocol);
+                typeWriter(text);
             }, 700);
         }
 
@@ -519,7 +698,6 @@
                 if (i >= text.length) {
                     clearInterval(typewriterTimer);
                     typewriterTimer = null;
-                    // После окончания печати кнопка больше не нужна
                     printAllBtn.style.display = "none";
                 }
             }, 15);
@@ -536,7 +714,38 @@
                 drop.style.animationDelay = Math.random() * 2 + "s";
                 rain.appendChild(drop);
             }
+            rain.style.opacity = '1';
+        }
+
+        function createWind() {
+            wind.innerHTML = "";
+
+            // Линии ветра
+            for (let i = 0; i < 60; i++) {
+                const particle = document.createElement("div");
+                particle.className = "wind-particle";
+                particle.style.top = Math.random() * 100 + "vh";
+                particle.style.width = 80 + Math.random() * 200 + "px";
+                particle.style.animationDuration = 1.5 + Math.random() * 2.5 + "s";
+                particle.style.animationDelay = Math.random() * 3 + "s";
+                wind.appendChild(particle);
+            }
+
+            // Пылевые частицы
+            for (let i = 0; i < 40; i++) {
+                const dust = document.createElement("div");
+                dust.className = "dust-particle";
+                dust.style.width = 2 + Math.random() * 5 + "px";
+                dust.style.height = dust.style.width;
+                dust.style.top = Math.random() * 100 + "vh";
+                dust.style.animationDuration = 2 + Math.random() * 4 + "s";
+                dust.style.animationDelay = Math.random() * 5 + "s";
+                wind.appendChild(dust);
+            }
+
+            wind.style.opacity = '1';
         }
     </script>
 </body>
 </html>
+```
